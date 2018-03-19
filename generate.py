@@ -38,6 +38,11 @@ def read_data():
 
 
 def make_text(m, s, l, o):
+
+    # Считываем модель, составляем список слов list_words,
+    # словарь частот frequency_words
+    # Вид словаря {'a b':'k'}, где a, b - пара слов, k - частота
+
     model = open(m, "r")
 
     list_words = []
@@ -52,12 +57,16 @@ def make_text(m, s, l, o):
         frequency_words[list[0] + ' ' + list[1]] = list[2]
     model.close()
 
+# Проверяем, задано ли первое слово в аргументах
     if s is not None:
         word = s
         text = [word]
     else:
         word = random.choice(list_words)
         text = [word]
+
+# Для слова строим список парных ему слов с учетом частоты, из них
+# выбираем рандомом следующее слово, проделываем то же для нового и тд
 
     for n in range(int(l)-1):
         list = []
@@ -72,6 +81,7 @@ def make_text(m, s, l, o):
         text.append(next_word)
         word = next_word
 
+# Проверяем, есть ли файл output и выводим наш текст
     if o is not None:
         out = open(o, "w")
         out.writelines("%s " % i for i in text)
