@@ -55,10 +55,8 @@ def read_files(dir, m, lc):
             if lc:
                 line = line.lower()
             words = re.findall(r'[a-zA-Z]+', line)
-            print(words)
             w = set(words)
             set_words.update(w)
-            print(set_words)
             for i in range(len(words) - 1):
                 if freq_words.get(words[i] + ' ' + words[i + 1]) is not None:
                     freq_words[words[i] + ' ' + words[i + 1]] += 1
