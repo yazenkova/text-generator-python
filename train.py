@@ -80,5 +80,4 @@ def read_files(dir, m, lc):
 
 
 res = read_data()
-print(res)
 read_files(**res)
