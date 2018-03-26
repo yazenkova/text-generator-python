@@ -38,12 +38,12 @@ def read_files(dir, m, lc):
         files = os.listdir(dir)
         for doc in files:
             if doc[0] != '.' and os.path.isfile(dir + doc):
-                path = dir + doc
+                path = dir + doc  # используй os.path.join
                 with open(path) as f:
                     for line in f:
                         if lc:
                             line = line.lower()
-                        words = re.findall(r'[a-zA-Z]+', line)
+                        words = re.findall(r'[a-zA-Z]+', line)  # почему без кириллицы
                         w = set(words)
                         set_words.update(w)
                         for i in range(len(words) - 1):
@@ -51,11 +51,13 @@ def read_files(dir, m, lc):
                                     is not None:
                                 freq_words[words[i] + ' ' + words[i + 1]] += 1
                             else:
-                                freq_words[words[i] + ' ' + words[i + 1]] = 1
+                                freq_words[words[i] + ' ' + words[i + 1]] = 1  # а для этого используй defaultdict и counter
                         words.clear()
 # Если ввод stdin
     else:
         for line in sys.stdin:
+            
+            # вообще кусок отсюда
             if lc:
                 line = line.lower()
             words = re.findall(r'[a-zA-Z]+', line)
@@ -67,10 +69,13 @@ def read_files(dir, m, lc):
                 else:
                     freq_words[words[i] + ' ' + words[i + 1]] = 1
             words.clear()
+            
+            # и досюда запихнуть в функцию, он повторяет полностью верхний 
 
     out = open(m, "w")
 
 # сохранение множества слов ( + их количество) и множества пар слов с частотами
+# используй pickle
 
     out.writelines("%s\n" % len(set_words))
     out.writelines("%s\n" % i for i in set_words)
@@ -81,5 +86,6 @@ def read_files(dir, m, lc):
     out.close()
 
 
+# if __name__ == '__main__':
 res = read_data()
 read_files(**res)
