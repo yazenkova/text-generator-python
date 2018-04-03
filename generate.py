@@ -18,7 +18,7 @@
 
 import argparse
 import random
-import re
+import pickle
 
 
 def read_data():
@@ -41,23 +41,14 @@ def make_text(m, s, l, o):
 
     # Считываем модель, составляем список слов list_words,
     # словарь частот frequency_words
-    # Вид словаря {'a b':'k'}, где a, b - пара слов, k - частота
+    
+    with open(m, 'rb') as f:
+        data = pickle.load(f)
 
-    model = open(m, "r")
-
-    list_words = []
-    frequency_words = {}
-
-    list_number = int(model.readline())
-    for i in range(list_number):
-        list_words.extend(re.findall(r'[a-zA-Z]+', model.readline()))
-    frequency_number = int(model.readline())
-    for i in range(frequency_number):
-        list = model.readline().split()
-        frequency_words[list[0] + ' ' + list[1]] = list[2]
-    model.close()
-
-# Проверяем, задано ли первое слово в аргументах
+    list_words = [i for i in data[0]]
+    frequency_words = data[1]
+    
+    # Проверяем, задано ли первое слово в аргументах
     if s is not None:
         word = s
         text = [word]
@@ -65,8 +56,8 @@ def make_text(m, s, l, o):
         word = random.choice(list_words)
         text = [word]
 
-# Для слова строим список парных ему слов с учетом частоты, из них
-# выбираем рандомом следующее слово, проделываем то же для нового и тд
+    # Для слова строим список парных ему слов с учетом частоты, из них
+    # выбираем рандомом следующее слово, проделываем то же для нового и тд
 
     for n in range(int(l)-1):
         list = []
@@ -91,5 +82,6 @@ def make_text(m, s, l, o):
             print(i, end=' ')
 
 
-res = read_data()
-make_text(**res)
+if __name__ == "__main__":
+    res = read_data()
+    make_text(**res)
