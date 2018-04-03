@@ -11,6 +11,8 @@ import sys
 import re
 import argparse
 import os
+import pickle
+from collections import Counter
 
 
 def read_data():
@@ -27,65 +29,46 @@ def read_data():
     return vars(result)
 
 
+# считывание одной строки и сохранение информации
+def read_line(lc, line, set_words, freq_words):
+    if lc:
+        line = line.lower()
+    words = re.findall(r'[a-zA-Zа-яА-я]+', line)
+    w = set(words)
+    set_words.update(w)
+    list_pair = [words[i] + ' ' + words[i + 1] for i in range(len(words) - 1)]
+    freq_words += Counter(list_pair)
+    words.clear()
+
+
 def read_files(dir, m, lc):
     # обрабатываем построчно тексты, строя множество всех слов
     # set_words и словарь частот frequency_words вида
     # {'a b':'k'}, где a, b - пара слов, k - частота
-    freq_words = {}
+    freq_words = Counter()
     set_words = set()
-# Если директория с колекцией документов задана:
+    # Если директория с колекцией документов задана:
     if dir is not None:
         files = os.listdir(dir)
+        os.chdir(dir)
         for doc in files:
-            if doc[0] != '.' and os.path.isfile(dir + doc):
-                path = dir + doc  # используй os.path.join
-                with open(path) as f:
+            if doc[0] != '.' and os.path.isfile(doc):
+                with open(doc) as f:
                     for line in f:
-                        if lc:
-                            line = line.lower()
-                        words = re.findall(r'[a-zA-Z]+', line)  # почему без кириллицы
-                        w = set(words)
-                        set_words.update(w)
-                        for i in range(len(words) - 1):
-                            if freq_words.get(words[i] + ' ' + words[i + 1]) \
-                                    is not None:
-                                freq_words[words[i] + ' ' + words[i + 1]] += 1
-                            else:
-                                freq_words[words[i] + ' ' + words[i + 1]] = 1  # а для этого используй defaultdict и counter
-                        words.clear()
-# Если ввод stdin
+                        read_line(lc, line, set_words, freq_words)
+    # Если ввод stdin
     else:
         for line in sys.stdin:
-            
-            # вообще кусок отсюда
-            if lc:
-                line = line.lower()
-            words = re.findall(r'[a-zA-Z]+', line)
-            w = set(words)
-            set_words.update(w)
-            for i in range(len(words) - 1):
-                if freq_words.get(words[i] + ' ' + words[i + 1]) is not None:
-                    freq_words[words[i] + ' ' + words[i + 1]] += 1
-                else:
-                    freq_words[words[i] + ' ' + words[i + 1]] = 1
-            words.clear()
-            
-            # и досюда запихнуть в функцию, он повторяет полностью верхний 
+            read_line(lc, line, set_words, freq_words)
 
-    out = open(m, "w")
+    # сохранение множества слов и множества пар слов с частотами
 
-# сохранение множества слов ( + их количество) и множества пар слов с частотами
-# используй pickle
+    data = [set_words, freq_words]
 
-    out.writelines("%s\n" % len(set_words))
-    out.writelines("%s\n" % i for i in set_words)
-    out.writelines("%s\n" % len(freq_words.keys()))
-    for key in freq_words:
-        out.writelines("%s %s\n" % (key, freq_words[key]))
-
-    out.close()
+    with open(m, 'wb') as f:
+        pickle.dump(data, f)
 
 
-# if __name__ == '__main__':
-res = read_data()
-read_files(**res)
+if __name__ == '__main__':
+    res = read_data()
+    read_files(**res)
