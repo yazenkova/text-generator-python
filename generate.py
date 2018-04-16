@@ -23,13 +23,13 @@ import pickle
 
 def read_data():
     parser = argparse.ArgumentParser()
-    parser.add_argument('-m', '--model', dest='m',
+    parser.add_argument('-m', '--model', dest='model',
                         help='path to model')
-    parser.add_argument('-s', '--seed', default=None, dest='s',
+    parser.add_argument('-s', '--seed', default=None, dest='seed',
                         help='first word of new text')
-    parser.add_argument('-l', '--length', dest='l',
+    parser.add_argument('-l', '--length', dest='length',
                         help='length of a new text')
-    parser.add_argument('-o', '--output', default=None, dest='o',
+    parser.add_argument('-o', '--output', default=None, dest='output',
                         help='path to output file')
 
     result = parser.parse_args()
@@ -37,53 +37,61 @@ def read_data():
     return vars(result)
 
 
-def make_text(m, s, l, o):  # НАЗВАНИЯ АРГУМЕНТОВ В ОДИН СИМВОЛ ЭТО ПЛОХО
+# Генерируем новое слово в тексте
+def choose_next_word(word, l_words, fr_words):
+    frequency_list = []
+    for i in l_words:
+        if fr_words.get(word + ' ' + i):
+            k = int(fr_words[word + ' ' + i])
+            for j in range(k):
+                frequency_list.append(i)
+    if not frequency_list:
+        frequency_list.append(random.choice(l_words))
+    next_word = random.choice(frequency_list)
+    return next_word
 
-    # Считываем модель, составляем список слов list_words,
-    # словарь частот frequency_words
-    
-    with open(m, 'rb') as f:
-        data = pickle.load(f)
 
-    list_words = [i for i in data[0]]
-    frequency_words = data[1]
-    
-    # Проверяем, задано ли первое слово в аргументах
-    if s is not None:  # можно просто if s
-        word = s
-        text = [word]
-    else:
-        word = random.choice(list_words)
-        text = [word]  # строчка повторяется можно написать ее один раз после if-else'a
-
-    # Для слова строим список парных ему слов с учетом частоты, из них
-    # выбираем рандомом следующее слово, проделываем то же для нового и тд
-
-    for n in range(int(l)-1):
-        list = []  # плохо использовать служебные слова в качестве имен переменных
-        for i in list_words:
-            if frequency_words.get(word + ' ' + i) is not None:  # можно опустить is not None
-                k = int(frequency_words[word + ' ' + i])
-                for j in range(k):
-                    list.append(i)
-        if len(list) == 0:  # if not list
-            list.append(random.choice(list_words))
-        next_word = random.choice(list)
-        text.append(next_word)
-        word = next_word
-
-# Проверяем, есть ли файл output и выводим наш текст
-    if o is not None:
-        out = open(o, "w")
+# Вывод полученного текста
+def write_output(output, text):
+    # Проверяем, есть ли файл output и выводим наш текст
+    if output:
+        out = open(output, "w")
         out.writelines("%s " % i for i in text)
         out.close()
     else:
         for i in text:
             print(i, end=' ')
 
-            
-# слишком большая функция!
-# ты ее уже по смыслу и комментариями разделила на куски, так пусть это будут функции
+
+# Создание текста на основе модели
+def make_text(model, seed, length, output):
+
+    # Считываем модель, составляем список слов list_words,
+    # словарь частот frequency_words
+
+    with open(model, 'rb') as f:
+        data = pickle.load(f)
+
+    list_words = [i for i in data[0]]
+    frequency_words = data[1]
+
+    # Проверяем, задано ли первое слово в аргументах
+    if seed:
+        word = seed
+    else:
+        word = random.choice(list_words)
+    text = [word]
+
+    # Для слова строим список парных ему слов с учетом частоты, из них
+    # выбираем рандомом следующее слово, проделываем то же для нового и тд
+
+    for n in range(int(length) - 1):
+        next_word = choose_next_word(word, list_words, frequency_words)
+        text.append(next_word)
+        word = next_word
+
+    write_output(output, text)
+
 
 if __name__ == "__main__":
     res = read_data()
