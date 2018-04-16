@@ -23,11 +23,11 @@ import pickle
 
 def read_data():
     parser = argparse.ArgumentParser()
-    parser.add_argument('-m', '--model', dest='model',
+    parser.add_argument('-m', '--model', dest='model', required=True,
                         help='path to model')
     parser.add_argument('-s', '--seed', default=None, dest='seed',
                         help='first word of new text')
-    parser.add_argument('-l', '--length', dest='length',
+    parser.add_argument('-l', '--length', dest='length', required=True,
                         help='length of a new text')
     parser.add_argument('-o', '--output', default=None, dest='output',
                         help='path to output file')
