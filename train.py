@@ -19,7 +19,7 @@ def read_data():
     parser = argparse.ArgumentParser()
     parser.add_argument('--input-dir', default=None, dest='dir',
                         help='path to collection of text files')
-    parser.add_argument('--model', action='store', required=True, dest='m',
+    parser.add_argument('--model', action='store', required=True, dest='model',
                         help='path to file for storage a text model')
     parser.add_argument('--lc', action='store_true', dest='lc',
                         help='make text in lower case')
@@ -29,7 +29,6 @@ def read_data():
     return vars(result)
 
 
-# считывание одной строки и сохранение информации
 def read_line(lc, line, set_words, freq_words):
     if lc:
         line = line.lower()
@@ -41,12 +40,13 @@ def read_line(lc, line, set_words, freq_words):
     words.clear()
 
 
-def read_files(dir, m, lc):
+def read_files(dir, model, lc):
     # обрабатываем построчно тексты, строя множество всех слов
     # set_words и словарь частот frequency_words вида
     # {'a b':'k'}, где a, b - пара слов, k - частота
     freq_words = Counter()
     set_words = set()
+    start_dir = os.getcwd()
     # Если директория с колекцией документов задана:
     if dir is not None:
         files = os.listdir(dir)
@@ -61,11 +61,12 @@ def read_files(dir, m, lc):
         for line in sys.stdin:
             read_line(lc, line, set_words, freq_words)
 
-    # сохранение множества слов и множества пар слов с частотами
+    # сохранение множества слов(+ их количество) и множества пар слов/частота
 
     data = [set_words, freq_words]
+    os.chdir(start_dir)
 
-    with open(m, 'wb') as f:
+    with open(model, 'wb') as f:
         pickle.dump(data, f)
 
 
