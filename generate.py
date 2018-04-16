@@ -37,7 +37,7 @@ def read_data():
     return vars(result)
 
 
-def make_text(m, s, l, o):
+def make_text(m, s, l, o):  # НАЗВАНИЯ АРГУМЕНТОВ В ОДИН СИМВОЛ ЭТО ПЛОХО
 
     # Считываем модель, составляем список слов list_words,
     # словарь частот frequency_words
@@ -49,24 +49,24 @@ def make_text(m, s, l, o):
     frequency_words = data[1]
     
     # Проверяем, задано ли первое слово в аргументах
-    if s is not None:
+    if s is not None:  # можно просто if s
         word = s
         text = [word]
     else:
         word = random.choice(list_words)
-        text = [word]
+        text = [word]  # строчка повторяется можно написать ее один раз после if-else'a
 
     # Для слова строим список парных ему слов с учетом частоты, из них
     # выбираем рандомом следующее слово, проделываем то же для нового и тд
 
     for n in range(int(l)-1):
-        list = []
+        list = []  # плохо использовать служебные слова в качестве имен переменных
         for i in list_words:
-            if frequency_words.get(word + ' ' + i) is not None:
+            if frequency_words.get(word + ' ' + i) is not None:  # можно опустить is not None
                 k = int(frequency_words[word + ' ' + i])
                 for j in range(k):
                     list.append(i)
-        if len(list) == 0:
+        if len(list) == 0:  # if not list
             list.append(random.choice(list_words))
         next_word = random.choice(list)
         text.append(next_word)
@@ -81,6 +81,9 @@ def make_text(m, s, l, o):
         for i in text:
             print(i, end=' ')
 
+            
+# слишком большая функция!
+# ты ее уже по смыслу и комментариями разделила на куски, так пусть это будут функции
 
 if __name__ == "__main__":
     res = read_data()
