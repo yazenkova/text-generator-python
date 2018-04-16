@@ -65,7 +65,7 @@ def make_text(m, s, l, o):
             if frequency_words.get(word + ' ' + i) is not None:
                 k = int(frequency_words[word + ' ' + i])
                 for j in range(k):
-                    list.extend(i)
+                    list.append(i)
         if len(list) == 0:
             list.append(random.choice(list_words))
         next_word = random.choice(list)
